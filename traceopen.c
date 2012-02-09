@@ -53,16 +53,24 @@ static void open_outputfile() {
     } else {
         r = asprintf(&filepath, "/tmp/" FILETMPLATE);
     }
-    if (r == -1)
+    if (r == -1) {
+        perror("asprintf failed");
         return;
+    }
 
     r = mkstemp(filepath);
     free(filepath);
     filepath = NULL;
-    if (r == -1)
+    if (r == -1) {
+        perror("mkstemp failed failed");
         return;
+    }
 
     outputfile = fdopen(r, "w");
+    if (outputfile == NULL) {
+        perror("fdopen failed");
+        return;
+    }
 }
 
 int open(const char *pathname, int flags, ...) {
@@ -76,8 +84,10 @@ int open(const char *pathname, int flags, ...) {
     /* Do nothing if file not open or write has error. Just call original open. */
     if (outputfile && pathname) {
         const char *abspath = (pathname[0] == '/') ? pathname : realpath(pathname, NULL);
-        if (abspath)
+        if (abspath) {
             fprintf(outputfile, "%s\n", abspath);
+            /*fprintf(stdout, "%s\n", abspath);*/
+        }
         if (abspath != pathname) {
             free((void *)abspath);
         }

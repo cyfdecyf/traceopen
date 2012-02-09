@@ -1,17 +1,18 @@
 CC = gcc
+CFLAGS = -O2
 
 UNAME := $(shell uname)
 
 ifeq ($(UNAME), Linux)
 TARG += traceopen.so
 traceopen.so: traceopen.c
-	$(CC) -shared -fPIC -ldl $< -o $@ -Wall
+	$(CC) $(CFLAGS) -shared -fPIC -ldl $< -o $@ -Wall
 ENVSRC = linuxenv
 endif
 ifeq ($(UNAME), Darwin)
 TARG += traceopen.dylib
 traceopen.dylib: traceopen.c
-	$(CC) -dynamiclib -undefined suppress -flat_namespace -ldl $< -o $@
+	$(CC) $(CFLAGS) -dynamiclib -fPIC -undefined suppress -flat_namespace -ldl $< -o $@
 ENVSRC = mac
 endif
 
