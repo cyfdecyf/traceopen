@@ -1,8 +1,11 @@
+#define _GNU_SOURCE
+
 #include <sys/fcntl.h>
 #include <dlfcn.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #ifdef __linux__
 #define LIBC "libc.so.6"
@@ -14,26 +17,71 @@
 
 int (*realopen)(const char *pathname, int flags, ...);
 
-int open(const char *pathname, int flags, ...) {
+/* The trace output directory should be specified as absolute path. */
+#define ENVVAR_TRACEDIR "TRACEDIR"
+/* A new file will be created in the trace dir during the first call to open. */
+FILE *outputfile;
+static int fileopend;
 
+static void resolve_realopen() {
     void *handle;    
     char *error;
 
-    if (!realopen) {
-        handle = dlopen(LIBC, RTLD_LAZY);
-        if ((error = dlerror())) {
-            puts(error);
-            exit(1);
-        }
-
-        realopen = dlsym(handle, "open");
-        if ((error = dlerror())) {
-            puts(error);
-            exit(1);
-        }
+    handle = dlopen(LIBC, RTLD_LAZY);
+    if ((error = dlerror())) {
+        puts(error);
+        exit(1);
     }
 
-    puts(pathname);
+    realopen = dlsym(handle, "open");
+    if ((error = dlerror())) {
+        puts(error);
+        exit(1);
+    }
+}
+
+#define FILETMPLATE "traceopenXXXXXX"
+static void open_outputfile() {
+    int r;
+    const char *envdir = getenv(ENVVAR_TRACEDIR);
+    char *filepath = NULL;
+
+    fileopend = 1;
+
+    if (envdir) {
+        r = asprintf(&filepath, "%s/" FILETMPLATE, envdir);
+    } else {
+        r = asprintf(&filepath, "/tmp/" FILETMPLATE);
+    }
+    if (r == -1)
+        return;
+
+    r = mkstemp(filepath);
+    free(filepath);
+    filepath = NULL;
+    if (r == -1)
+        return;
+
+    outputfile = fdopen(r, "w");
+}
+
+int open(const char *pathname, int flags, ...) {
+    if (!realopen) {
+        resolve_realopen();
+    }
+    if (!fileopend) {
+        open_outputfile();
+    }
+
+    /* Do nothing if file not open or write has error. Just call original open. */
+    if (outputfile && pathname) {
+        const char *abspath = (pathname[0] == '/') ? pathname : realpath(pathname, NULL);
+        if (abspath)
+            fprintf(outputfile, "%s\n", abspath);
+        if (abspath != pathname) {
+            free((void *)abspath);
+        }
+    }
 
     /* Part of the glibc implementation uses the following check. But actually,
      * passing O_CREAT without specifying mode will not cause error in both
@@ -54,6 +102,5 @@ int open(const char *pathname, int flags, ...) {
     } else {
         return realopen(pathname, flags);
     }
-
 }
 
