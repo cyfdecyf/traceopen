@@ -1,0 +1,10 @@
+#!/bin/bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+os=`uname`
+
+if [[ $os == "Linux" ]]; then
+    export LD_PRELOAD=${DIR}/traceopen.so
+elif [[ $os == "Darwin" ]]; then
+    export DYLD_INSERT_LIBRARIES=${DIR}/traceopen.dylib
+fi
