@@ -1,0 +1,11 @@
+#!/usr/bin/env stap
+
+probe syscall.open {
+    /* In SystemTap, @1 is the 1st string command line argument (use $1 for integer argument)
+    /* @1 should be the program want to trace the open system call
+     * @2 should be the directory whose files are of interest
+     */
+    if (execname() == @1 && isinstr(filename, @2) == 1) {
+	printf("%s\n", filename)
+    }
+}
