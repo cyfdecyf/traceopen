@@ -19,6 +19,9 @@ me to try other approaches:
 The utilities are useful for me. (At least solves the problem of building a clean
 tag file.) But the system instrumentation tools I learned are more valuable.
 
+For more instructions on how to use these scripts to create a ctags/cscope tag
+file, refer to `README.mkd` in each subdirectory.
+
 # DTrace
 
 # SystemTap
@@ -26,12 +29,14 @@ tag file.) But the system instrumentation tools I learned are more valuable.
 I've only glimpsed over the [SystemTap Tutorial](http://sourceware.org/systemtap/tutorial.pdf)
 and created the script `systemtap/traceopen.stp`.
 
-To use the script, you need to first install SystemTap. On Debian 6:
+To use SystemTap, you need to first install SystemTap. On Debian 6:
 
     aptitude install systemtap linux-headers-2.6.32-5-amd64 linux-headers-2.6.32-5-amd6-dbg
 
 **Make sure the running kernel matches the debug info installed.** Otherwise,
 SystemTap will report build-id mismatch error.
+
+Add the user to `stapdev` and `stapusr` group.
 
 Run the trace as follows:
 

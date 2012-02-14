@@ -1,0 +1,12 @@
+How to generate tag file
+========================
+
+Create symlinks to `start-trace.sh`, `cfilelist.sh` and `mktag.sh` (in the
+`scripts` directory) in your working directory.
+
+1. `./start-trace.sh gcc`
+2. Run the program you want to trace, e.g. start make, which will call gcc
+3. Run `cfilelist.sh > allfiles` to create a list of all C source and header
+   file list
+4. Run `mktag.sh allfiles` to build ctags and cscope tags
+
