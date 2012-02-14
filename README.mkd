@@ -19,11 +19,27 @@ me to try other approaches:
 The utilities are useful for me. (At least solves the problem of building a clean
 tag file.) But the system instrumentation tools I learned are more valuable.
 
-The following sections will introduce how each approach works.
-
 # DTrace
 
 # SystemTap
+
+I've only glimpsed over the [SystemTap Tutorial](http://sourceware.org/systemtap/tutorial.pdf)
+and created the script `systemtap/traceopen.stp`.
+
+To use the script, you need to first install SystemTap. On Debian 6:
+
+    aptitude install systemtap linux-headers-2.6.32-5-amd64 linux-headers-2.6.32-5-amd6-dbg
+
+**Make sure the running kernel matches the debug info installed.** Otherwise,
+SystemTap will report build-id mismatch error.
+
+Run the trace as follows:
+
+    stap traceopen.stp --vp 00001
+
+The `--vp 00001` makes SystemTap output debug message at the 5th pass, which is
+when the script actually runs. After that, start your program to trace its open
+system call.
 
 # Shared library
 
