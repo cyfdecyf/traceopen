@@ -3,5 +3,6 @@
 require 'pathname'
 
 STDIN.each_line do |file|
-  puts Pathname.new(file).cleanpath
+  pa = Pathname.new(file.chomp).cleanpath
+  puts pa if pa.exist?
 end

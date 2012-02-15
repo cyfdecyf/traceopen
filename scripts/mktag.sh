@@ -10,6 +10,6 @@ fi
 
 LISTFILE=cscope.files
 
-${SRCDIR}/cleanpath.rb < $1 | grep -v '/$' | sort -u > $LISTFILE
+grep -v '/$' $1 | sort -u | ${SRCDIR}/cleanpath.rb | sort -u > $LISTFILE
 cscope -b
 ctags -L $LISTFILE
