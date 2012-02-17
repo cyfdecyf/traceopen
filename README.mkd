@@ -72,3 +72,13 @@ actually. And I remembered DTrace. So instead of fighting against problem, I
 moved to the DTrace approach, which would be more easy and possibly more
 efficient.
 
+Notes on getting non-existing file
+==================================
+
+The initial implementation will get non existing files outputed. It's because I
+didn't check the return value of `open`. Maybe the traced program just opens an
+non-existing file.
+
+If you want only existing file to be outputed, find ways to check the return
+value and print out only when `open` succeeded.
+

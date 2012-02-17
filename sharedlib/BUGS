@@ -1,3 +1,0 @@
-- The shared library approach seems to get incorrect path while trace the open
-  path during make. Lots of system include files are treated as they are in the
-  project directory.
